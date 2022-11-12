@@ -1,0 +1,107 @@
+# Starter pipeline
+
+
+
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+- Registration-Branch
+- Login-Branch
+
+stages:
+- stage: Code
+  jobs:
+  - job: Build
+    pool:
+        vmImage: windows-latest
+    steps:
+    - script: echo Hello, world!
+
+      displayName: 'Run a one-line script'
+    - script: python -m pip install pymongo
+      displayName: 'pymongo'
+
+    - script: python -m pip install --upgrade pip
+      displayName: 'Install dependencies'
+    - task: SonarCloudPrepare@1
+      inputs:
+        SonarCloud: 'BankKiosk'
+        organization: 'bankkiosk-champsteam'
+        scannerMode: 'CLI'
+        configMode: 'manual'
+        cliProjectKey: 'BankKiosk-ChampsTeam_BankKiosk'
+        cliProjectName: 'BankKiosk'
+        cliSources: '.'
+    
+    - task: PythonScript@0
+      inputs:
+        scriptSource: 'filePath'
+        scriptPath: 'src/DB/DB.py'
+      displayName: 'Build and test DB.py'
+    #- task: PythonScript@0
+      # inputs:
+     # scriptSource: 'filePath'
+     # scriptPath: 'src/Login/Pac.py'
+    
+
+    #- task: PythonScript@0
+      # inputs:
+    #  scriptSource: 'filePath'
+     # scriptPath: 'src/Login/ValidateEmailCode.py'
+    - task: PythonScript@0
+      inputs:
+        scriptSource: 'filePath'
+        scriptPath: 'src/Login/FindLostAccount.py'
+      displayName: 'Build and test FindLostAccount.py'
+    - task: PythonScript@0
+      inputs:
+        scriptSource: 'filePath'
+        scriptPath: 'src/Registration/Email.py'
+      displayName: 'Build and test Email.py'
+
+  #  - task: PythonScript@0
+   #   inputs:
+    #    scriptSource: 'filePath'
+     #   scriptPath: 'src/Registration/emailCredentials.py'
+      #displayName: 'Build and test EmailCredentails.py'
+    - task: PythonScript@0
+      inputs:
+        scriptSource: 'filePath'
+        scriptPath: 'src/Registration/MongoCreateAccount.py'
+      displayName: 'Build and test MongoCreateAccount.py'
+    - task: PythonScript@0
+      inputs:
+        scriptSource: 'filePath'
+        scriptPath: 'src/ValidationGeneration/Generator.py'
+      displayName: 'Build and test Generator.py'
+    - task: PythonScript@0
+      inputs:
+        scriptSource: 'filePath'
+        scriptPath: 'src/ValidationGeneration/Validator.py'
+      displayName: 'Build and test Validator.py'
+
+ # - job: Test
+    #step:
+
+
+
+  #- task: PythonScript@0
+  # inputs:
+    #  scriptSource: 'filePath'
+    # scriptPath: 'src/Login/emailCredentials.py'
+  #- task: PythonScript@0
+  # inputs:
+    #  scriptSource: 'filePath'
+    # scriptPath: 'src/Registration/regNumValidation.py'
+  
+
+  
+  
+  
+
+
+    - task: SonarCloudAnalyze@1
+    
